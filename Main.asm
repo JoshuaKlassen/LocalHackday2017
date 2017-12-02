@@ -3,6 +3,11 @@
 ; It is common to move out all of the header info
 ; out into another file and include it
 
+;---------------------------
+;includes
+;---------------------------
+
+INCLUDE "constants.asm"
 
 ;---------------------------
 ;restart sections
@@ -57,7 +62,7 @@ SECTION "Joypad Intterupt", ROM0[$60]
 
 SECTION "Entrypoint", ROM0[$100]
 	nop
-	jp 	main
+	jp 	Main
 
 ;---------------------------
 ;ROM information
@@ -143,14 +148,24 @@ SECTION "Rom Header", ROM0[$104]
 
 SECTION "Program Start", ROM0[$150]
 
-main:
+Main::
 
-; YOUR CODE HERE
+	DI					;disable interrupts
 
-; todo: remove this
-loop
+	LD sp, $FFFE		;reset stack pointer
+
+	LD a, mSetLowBit	;force vblank interrupt
+	LD [rIE], a
+	EI
+
+.main_loop
+	
+	INC A
 	nop
-	jp loop
+
+	jp .main_loop
+
+
 
 ;---------------------------
 ;interrupt service routines

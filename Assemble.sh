@@ -11,9 +11,9 @@ echo "Assembling:" $ASSEMBLY_FILE "..."
 
 #set -x
 echo rgbasm -v -o $OBJECT_FILE $ASSEMBLY_FILE
-#rgbasm -v -o $OBJECT_FILE $ASSEMBLY_FILE
+rgbasm -v -o $OBJECT_FILE $ASSEMBLY_FILE
 echo rgblink -m $MAP_FILE -n $SYMBOL_FILE -o $EXECUTABLE_FILE $OBJECT_FILE
-#rgblink -m $MAP_FILE -n $SYMBOL_FILE -o $EXECUTABLE_FILE $OBJECT_FILE
+rgblink -m $MAP_FILE -n $SYMBOL_FILE -o $EXECUTABLE_FILE $OBJECT_FILE
 echo rgbfix -v -p 0 $EXECUTABLE_FILE
-#rgbfix -v -p 0 $EXECUTABLE_FILE
+rgbfix -v -p 0 $EXECUTABLE_FILE
 #set +x
