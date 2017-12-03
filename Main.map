@@ -1,4 +1,19 @@
 ROM Bank #0 (HOME):
+  SECTION: $0063-$00D1 ($006F bytes) ["Utils"]
+           $00B6 = dma_routine
+           $00C8 = COPY_DMA_ROUTINE.copy_dma_routine
+           $0063 = WAIT_VBLANK
+           $00A8 = LCD_OFF
+           $006A = CLEAR_SCREEN
+           $0088 = CLEAR_RAM
+           $0079 = CLEAR_OAM
+           $00AF = LCD_ON
+           $00C0 = COPY_DMA_ROUTINE
+           $0097 = LOAD_TILES
+  SECTION: $00D2-$00F2 ($0021 bytes) ["Player"]
+           $00E2 = PLAYER_OAM
+           $00D2 = PLAYER_INIT
+           $00D8 = PLAYER_UPDATE
   SECTION: $0000-$0000 ($0001 bytes) ["Restart $00"]
   SECTION: $0008-$0008 ($0001 bytes) ["Restart $08"]
   SECTION: $0010-$0010 ($0001 bytes) ["Restart $10"]
@@ -14,28 +29,22 @@ ROM Bank #0 (HOME):
   SECTION: $0060-$0062 ($0003 bytes) ["Joypad Intterupt"]
   SECTION: $0100-$0103 ($0004 bytes) ["Entrypoint"]
   SECTION: $0104-$014F ($004C bytes) ["Rom Header"]
-  SECTION: $0150-$0294 ($0145 bytes) ["Program Start"]
-           $0290 = VBlankInterrupt
-           $0291 = LCDInterrupt
-           $0292 = TimerInterrupt
-           $0293 = SerialInterrupt
-           $0294 = JoypadInterrupt
+  SECTION: $0150-$018B ($003C bytes) ["Program Start"]
+           $0187 = VBlankInterrupt
+           $0188 = LCDInterrupt
+           $0189 = TimerInterrupt
+           $018A = SerialInterrupt
+           $018B = JoypadInterrupt
            $0150 = Main
-           $0196 = WAIT_VBLANK
-           $01D5 = LCD_OFF
-           $01A5 = CLEAR_SCREEN
-           $01F3 = Hello_Tiles
-           $01B4 = LOAD_TILES
-           $01DC = LCD_ON
-           $019D = UPDATE_GAME
-           $0186 = Main.main_loop
-           $0283 = Hello_Map
-    SLACK: $3E54 bytes
+           $0183 = UPDATE_GAME
+           $0177 = Main.main_loop
+    SLACK: $3ECD bytes
 
 WRAM Bank #0:
   SECTION: $C000-$C001 ($0002 bytes) ["RAM Vars"]
            $C001 = player_y
   SECTION: $C100-$C103 ($0004 bytes) ["OAM Vars"]
+           $C100 = player_sprite
     SLACK: $0FFA bytes
 
 WRAM Bank #1:

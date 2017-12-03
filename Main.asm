@@ -9,6 +9,8 @@
 
 INCLUDE "constants.asm"
 INCLUDE "vars.asm"
+INCLUDE "Utils.asm"
+INCLUDE "player.asm"
 
 ;---------------------------
 ;restart sections
@@ -151,167 +153,45 @@ SECTION "Program Start", ROM0[$150]
 
 Main::
 
-.init
-
 	di					;disable interrupts
 
 	ld sp, $FFFE		;reset stack pointer
 
-	call WAIT_VBLANK
-	call LCD_OFF
+	call WAIT_VBLANK	;wait for vblank
+	
+	call LCD_OFF		;turn off lcd
 
-	call CLEAR_SCREEN
+	call CLEAR_SCREEN	;clear everything
+	call CLEAR_RAM
+	call CLEAR_OAM
 
 	ld a, mBgPalette	;load our palette
 	ld [rBGP], a
 
-	ld hl, Hello_Tiles
-	ld bc, 9*16
-	call LOAD_TILES
+	call PLAYER_INIT	;init player
 
-	;call LOAD_MAP
-
-	ei
-
-	ld	a, 30
-	ld	[_spr0_y], a
-	ld 	[_spr0_x], a
-	ld 	a, $19
-	ld 	[_spr0_num], a
-	ld 	a, 0
-	ld	[_spr0_att], a
-
-	ld a, [rLCDC]
+	ld a, [rLCDC]		;allow sprites
 	set 1, a
 	ld [rLCDC], a
 
-	call LCD_ON
+	call LCD_ON			;turn on lcd
 
+	call COPY_DMA_ROUTINE
+
+	ei
 
 .main_loop
 	
 	call WAIT_VBLANK
-
+	call _HRAM
 	call UPDATE_GAME
-
-	ld	a, [player_y]
-	ld 	hl, _spr0_y
-	ld 	[hl], a
 
 	jp .main_loop
 
 
-WAIT_VBLANK::
-	ld a, [rLY]			;load y cord of scanline
-	cp 145				;line 145 = we are in vblank
-	jr nz, WAIT_VBLANK
-	ret
-
 UPDATE_GAME:
-	ld a, [player_y]
-	inc a
-	ld [player_y], a
-
+	call PLAYER_UPDATE
 	ret
-
-CLEAR_SCREEN:
-	ld hl, lSCRN0
-	ld bc, 32*32
-.clear_screen_loop
-	ld a,$0
-	ldi [hl], a
-	dec bc
-	ld a, b
-	or c
-	jr nz, .clear_screen_loop
-
-	ret
-
-;----------------------------
-;LOAD_TILE
-;
-; loads a tile into VRAM
-; parameters: 
-;		hl: start of tile(s)
-; 		bc: number of bytes
-;
-;----------------------------
-
-LOAD_TILES:
-	push af						;store af
-	push de						;store de
-
-	ld de, lVRAM				;load location of vram
-
-.load_tile_loop
-	ld a,[hl]					;load value at hl into a
-	inc hl						;increment hl
-	ld [de], a					;load value of a into address at de
-	inc de						;increment de
-	dec bc						;decrement tile count
-	ld a,b						
-	or c
-	jr nz, .load_tile_loop
-
-	pop de						;restore de
-	pop af						;restore af
-
-	ret
-
-LOAD_MAP:
-	ld hl, Hello_Map
-	ld de, lSCRN0
-	ld c, 13
-.load_map_loop
-	ld a,[hl]
-	inc hl
-	ld [de], a
-	inc de
-	dec c
-	jr nz, .load_map_loop
-	ret
-
-
-LCD_OFF:
-	
-	ld a, [rLCDC]
-	res 7, a
-	ld [rLCDC], a
-	ret
-
-LCD_ON:
-
-	ld a, [rLCDC]
-	set 7, a
-	ld [rLCDC], a
-	ret
-
-My_Tile:
-DB $7C,$7C,$00,$C6,$C6,$00,$00,$FE,$C6,$C6,$00,$C6,$C6,$00,$00,$00
-
-Hello_Tiles:
-DB $00,$00,$00,$00,$00,$00,$00,$00
-DB $00,$00,$00,$00,$00,$00,$00,$00
-DB $C6,$C6,$C6,$C6,$C6,$C6,$FE,$FE
-DB $FE,$FE,$C6,$C6,$C6,$C6,$C6,$C6
-DB $FE,$FE,$FE,$FE,$80,$80,$F8,$F8
-DB $F8,$F8,$80,$80,$FE,$FE,$FE,$FE
-DB $C0,$C0,$C0,$C0,$C0,$C0,$C0,$C0
-DB $C0,$C0,$C0,$C0,$FE,$FE,$FE,$FE
-DB $7C,$7C,$FE,$FE,$C6,$C6,$C6,$C6
-DB $C6,$C6,$C6,$C6,$FE,$FE,$7C,$7C
-DB $C6,$C6,$C6,$C6,$C6,$C6,$C6,$C6
-DB $D6,$D6,$D6,$D6,$FE,$FE,$6C,$6C
-DB $FC,$FC,$FE,$FE,$C6,$C6,$FC,$FC
-DB $FC,$FC,$C6,$C6,$C6,$C6,$C6,$C6
-DB $FC,$FC,$FE,$FE,$C6,$C6,$C6,$C6
-DB $C6,$C6,$C6,$C6,$FE,$FE,$FC,$FC
-DB $6C,$6C,$6C,$6C,$6C,$6C,$6C,$6C
-DB $6C,$6C,$6C,$6C,$00,$00,$6C,$6C
-
-Hello_Map:
-DB $01,$02,$03,$03,$04,$00,$05,$04,$06,$03,$07,$08,$19
-
 ;---------------------------
 ;interrupt service routines
 ;---------------------------
