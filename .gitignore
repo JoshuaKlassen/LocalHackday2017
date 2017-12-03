@@ -1,2 +1,5 @@
 *.sym
+*.map
+*.o
 *.gb
+LICENSE
