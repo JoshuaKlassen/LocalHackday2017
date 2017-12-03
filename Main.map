@@ -14,26 +14,29 @@ ROM Bank #0 (HOME):
   SECTION: $0060-$0062 ($0003 bytes) ["Joypad Intterupt"]
   SECTION: $0100-$0103 ($0004 bytes) ["Entrypoint"]
   SECTION: $0104-$014F ($004C bytes) ["Rom Header"]
-  SECTION: $0150-$026A ($011B bytes) ["Program Start"]
-           $0262 = VBlankInterrupt
-           $0267 = LCDInterrupt
-           $0268 = TimerInterrupt
-           $0269 = SerialInterrupt
-           $026A = JoypadInterrupt
+  SECTION: $0150-$0294 ($0145 bytes) ["Program Start"]
+           $0290 = VBlankInterrupt
+           $0291 = LCDInterrupt
+           $0292 = TimerInterrupt
+           $0293 = SerialInterrupt
+           $0294 = JoypadInterrupt
            $0150 = Main
-           $0177 = WAIT_VBLANK
-           $01AF = LCD_OFF
-           $017F = CLEAR_SCREEN
-           $01CD = Hello_Tiles
-           $018E = LOAD_TILE
-           $019F = LOAD_MAP
-           $01B6 = LCD_ON
-           $0171 = Main.main_loop
-           $025D = Hello_Map
-    SLACK: $3E7E bytes
+           $0196 = WAIT_VBLANK
+           $01D5 = LCD_OFF
+           $01A5 = CLEAR_SCREEN
+           $01F3 = Hello_Tiles
+           $01B4 = LOAD_TILES
+           $01DC = LCD_ON
+           $019D = UPDATE_GAME
+           $0186 = Main.main_loop
+           $0283 = Hello_Map
+    SLACK: $3E54 bytes
 
 WRAM Bank #0:
-  EMPTY
+  SECTION: $C000-$C001 ($0002 bytes) ["RAM Vars"]
+           $C001 = player_y
+  SECTION: $C100-$C103 ($0004 bytes) ["OAM Vars"]
+    SLACK: $0FFA bytes
 
 WRAM Bank #1:
   EMPTY

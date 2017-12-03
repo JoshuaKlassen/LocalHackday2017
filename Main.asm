@@ -8,6 +8,7 @@
 ;---------------------------
 
 INCLUDE "constants.asm"
+INCLUDE "vars.asm"
 
 ;---------------------------
 ;restart sections
@@ -152,32 +153,50 @@ Main::
 
 .init
 
-	DI					;disable interrupts
+	di					;disable interrupts
 
-	LD sp, $FFFE		;reset stack pointer
+	ld sp, $FFFE		;reset stack pointer
 
 	call WAIT_VBLANK
 	call LCD_OFF
 
 	call CLEAR_SCREEN
 
-	LD a, mBgPalette	;load our palette
-	LD [rBGP], a
+	ld a, mBgPalette	;load our palette
+	ld [rBGP], a
 
 	ld hl, Hello_Tiles
 	ld bc, 9*16
-	call LOAD_TILE
+	call LOAD_TILES
 
-	call LOAD_MAP
+	;call LOAD_MAP
+
+	ei
+
+	ld	a, 30
+	ld	[_spr0_y], a
+	ld 	[_spr0_x], a
+	ld 	a, $19
+	ld 	[_spr0_num], a
+	ld 	a, 0
+	ld	[_spr0_att], a
+
+	ld a, [rLCDC]
+	set 1, a
+	ld [rLCDC], a
 
 	call LCD_ON
 
-	EI
 
 .main_loop
 	
-	halt
-	nop
+	call WAIT_VBLANK
+
+	call UPDATE_GAME
+
+	ld	a, [player_y]
+	ld 	hl, _spr0_y
+	ld 	[hl], a
 
 	jp .main_loop
 
@@ -189,6 +208,10 @@ WAIT_VBLANK::
 	ret
 
 UPDATE_GAME:
+	ld a, [player_y]
+	inc a
+	ld [player_y], a
+
 	ret
 
 CLEAR_SCREEN:
@@ -214,31 +237,31 @@ CLEAR_SCREEN:
 ;
 ;----------------------------
 
-LOAD_TILE:
-	push af
-	push de
+LOAD_TILES:
+	push af						;store af
+	push de						;store de
 
-	ld de, lVRAM
+	ld de, lVRAM				;load location of vram
 
 .load_tile_loop
-	ld a,[hl]
-	inc hl
-	ld [de], a
-	inc de
-	dec bc
-	ld a,b
+	ld a,[hl]					;load value at hl into a
+	inc hl						;increment hl
+	ld [de], a					;load value of a into address at de
+	inc de						;increment de
+	dec bc						;decrement tile count
+	ld a,b						
 	or c
 	jr nz, .load_tile_loop
 
-	pop de
-	pop af
+	pop de						;restore de
+	pop af						;restore af
 
 	ret
 
 LOAD_MAP:
 	ld hl, Hello_Map
 	ld de, lSCRN0
-	ld c, 5
+	ld c, 13
 .load_map_loop
 	ld a,[hl]
 	inc hl
@@ -287,19 +310,12 @@ DB $6C,$6C,$6C,$6C,$6C,$6C,$6C,$6C
 DB $6C,$6C,$6C,$6C,$00,$00,$6C,$6C
 
 Hello_Map:
-DB $01,$02,$03,$03,$04
+DB $01,$02,$03,$03,$04,$00,$05,$04,$06,$03,$07,$08,$19
 
 ;---------------------------
 ;interrupt service routines
 ;---------------------------
 VBlankInterrupt:
-
-	PUSH af				;save regs
-	PUSH bc
-
-	POP bc				;load regs
-	POP af
-
 	reti
 LCDInterrupt:
 	reti
