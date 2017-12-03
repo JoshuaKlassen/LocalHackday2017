@@ -7,7 +7,7 @@ WAIT_VBLANK::
 	ret
 
 CLEAR_SCREEN::
-	ld hl, lSCRN0
+	ld hl, _SCRN0
 	ld bc, 32*32
 .clear_screen_loop
 	ld a,$0
@@ -20,7 +20,7 @@ CLEAR_SCREEN::
 	ret
 
 CLEAR_OAM:
-	ld hl, OAMRAM
+	ld hl, _OAMRAM
 	ld bc, $A0		;160
 
 .clear_oam_loop
@@ -58,7 +58,7 @@ LOAD_TILES::
 	push af						;store af
 	push de						;store de
 
-	ld de, lVRAM				;load location of vram
+	ld de, _VRAM				;load location of vram
 
 .load_tile_loop
 	ld a,[hl]					;load value at hl into a
@@ -77,7 +77,7 @@ LOAD_TILES::
 
 ;LOAD_MAP::
 ;	ld hl, Hello_Map
-;	ld de, lSCRN0
+;	ld de, _SCRN0
 ;	ld c, 13
 .load_map_loop
 ;	ld a,[hl]
